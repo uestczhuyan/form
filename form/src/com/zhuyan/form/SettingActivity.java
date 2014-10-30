@@ -10,10 +10,13 @@
 package com.zhuyan.form;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Address;
@@ -88,6 +91,7 @@ public class SettingActivity  extends SherlockActivity{
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				System.out.println("add file");
+				creatFile();
 			}
 		});
 		adapter = new MyAdapter();
@@ -96,6 +100,57 @@ public class SettingActivity  extends SherlockActivity{
 	
 	
 	
+	protected void creatFile() {
+		// TODO Auto-generated method stub
+		final EditText et = new EditText(SettingActivity.this); 
+		AlertDialog.Builder builder = new AlertDialog.Builder(SettingActivity.this);
+		builder.setTitle("创建新的文件");
+		builder.setView(et);
+		builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				String content = et.getText().toString().trim();
+				if(content == null || content.length() <= 0){
+					toastShow("文件名不能为空");
+				}else{
+					if(!content.endsWith(".txt")){
+						content = content+".txt";
+					}
+					for(File file:files){
+						if(file.getName().equals(content)){
+							toastShow("文件已经存在");
+							return;
+						}
+					}
+					File file =  new File(SettingShares.ROOT+"/"+content);
+					try {
+						file.createNewFile();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					freshFileList();
+					adapter.notifyDataSetChanged();
+					dialog.cancel();
+					dialog = null;
+				}
+			}
+		})
+		.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+//				dialog.dismiss();
+				dialog.cancel();
+				dialog = null;
+			}
+		});
+		builder.create().show();
+	}
+
 	/**
 	 * 
 	 */
@@ -166,6 +221,10 @@ public class SettingActivity  extends SherlockActivity{
 			return ;
 		}
 		finish();
+	}
+	
+	private void toastShow(String context){
+		Toast.makeText(SettingActivity.this, context, Toast.LENGTH_SHORT).show();
 	}
 	
 	private  class MyAdapter  extends BaseAdapter{
