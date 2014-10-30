@@ -60,8 +60,6 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 		
 //		testAddData();
 		
-		System.out.println(SettingShares.ROOT);
-		
 		initData();
 		init();
 	}
@@ -89,15 +87,6 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 		File file = new File(SettingShares.ROOT);
 		if(!file.exists() || !file.isDirectory()){
 			file.mkdirs();
-		}
-		contentFile = new File(SettingShares.ROOT+"/"+SettingShares.getFileName(sharedPreferences));
-		if(!contentFile.exists() || !contentFile.isFile()){
-			try {
-				contentFile.createNewFile();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 		}
 	}
 
@@ -138,6 +127,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 	@Override
 	protected void onStop() {
 		// TODO Auto-generated method stub
+		System.out.println("stop "+contentFile.getName());
 		BufferedWriter writer = null;
 		try {
 			writer = new BufferedWriter(new FileWriter(contentFile));
@@ -172,7 +162,22 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 	@Override
 	protected void onResume() {
 		// TODO Auto-generated method stub
+		contentFile = new File(SettingShares.ROOT+"/"+SettingShares.getFileName(sharedPreferences));
+		
+//		System.out.println("resume "+contentFile.getName());
+		
+		if(!contentFile.exists() || !contentFile.isFile()){
+			try {
+//				System.out.println("resume create "+contentFile.getName());
+				contentFile.createNewFile();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
 		BufferedReader dr = null;
+		arrays.clear();
 		try {
 			dr = new BufferedReader(new FileReader(contentFile)); 
 			String key = null;
@@ -198,6 +203,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 				}
 			}
 		}
+		System.out.println(contentFile.getName()+"   "+arrays.size());
 		adapter.notifyDataSetChanged();
 		super.onResume();
 	}

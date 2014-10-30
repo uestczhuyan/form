@@ -26,6 +26,8 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -96,6 +98,18 @@ public class SettingActivity  extends SherlockActivity{
 		});
 		adapter = new MyAdapter();
 		listView.setAdapter(adapter);
+		listView.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				// TODO Auto-generated method stub
+				if(!(position == files.size())){
+					SettingShares.storeFileName(files.get(position).getName(), sharedPreferences);
+					finish();
+				}
+			}
+		});
  	}
 	
 	
