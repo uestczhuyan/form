@@ -127,7 +127,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 	@Override
 	protected void onStop() {
 		// TODO Auto-generated method stub
-		System.out.println("stop "+contentFile.getName());
+//		System.out.println("stop "+contentFile.getName());
 		BufferedWriter writer = null;
 		try {
 			writer = new BufferedWriter(new FileWriter(contentFile));
@@ -182,10 +182,25 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 			dr = new BufferedReader(new FileReader(contentFile)); 
 			String key = null;
 			int i =0;
+			StringBuilder builder = null;
 			while (true) {
 				key = dr.readLine();
 				if(key == null){
 					break;
+				}
+				if(key.length() > 4 && !key.contains("/")){
+					if(builder == null){
+						builder = new StringBuilder();
+					}
+					builder.delete(0, builder.length());
+					
+					for(int j=0;j<key.length();j++){
+						builder.append(key.charAt(j));
+						if(j%3 == 2){
+							builder.append("/");
+						}
+					}
+					key = builder.toString();
 				}
 				arrays.put(i, key);
 				i++;
@@ -203,7 +218,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 				}
 			}
 		}
-		System.out.println(contentFile.getName()+"   "+arrays.size());
+//		System.out.println(contentFile.getName()+"   "+arrays.size());
 		adapter.notifyDataSetChanged();
 		super.onResume();
 	}
