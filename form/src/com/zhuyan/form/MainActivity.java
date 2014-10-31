@@ -52,6 +52,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 	private  Map<Integer, String> arrays = new HashMap<Integer, String>();
 	private MyAdapter adapter;
 	private Map<String, String> keyMap = new HashMap<String, String>();
+	private String[][] keyMapValues = new String[5][2];
 	private SharedPreferences sharedPreferences;
 	private File contentFile;
 	
@@ -80,13 +81,18 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 	private void initData() {
 		// TODO Auto-generated method stub
 		keyMap.put("211", "1");
-		keyMap.put("122", "2");
-		keyMap.put("222", "3");
-		keyMap.put("111", "4");
-		keyMap.put("212", "5");
-		keyMap.put("121", "6");
-		keyMap.put("221", "7");
-		keyMap.put("112", "8");
+		keyMap.put("122", "1");
+		keyMap.put("222", "2");
+		keyMap.put("111", "2");
+		keyMap.put("212", "3");
+		keyMap.put("121", "3");
+		keyMap.put("221", "4");
+		keyMap.put("112", "4");
+		
+		keyMapValues[1] = new String[]{"211","122"};
+		keyMapValues[2] = new String[]{"222","111"};
+		keyMapValues[3] = new String[]{"212","121"};
+		keyMapValues[4] = new String[]{"221","112"};
 		
 		File file = new File(SettingShares.ROOT);
 		if(!file.exists() || !file.isDirectory()){
@@ -311,8 +317,9 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 				if(arrays.get(selectIndex-patch).length() >= startPos + 3){
 					if(key == null){
 						key = arrays.get(selectIndex-patch).substring(startPos,startPos+3);
+						key = keyMap.get(key);
 					}else{
-						if(!key.equals(arrays.get(selectIndex-patch).substring(startPos,startPos+3))){
+						if(!(key.equals(keyMap.get(arrays.get(selectIndex-patch).substring(startPos,startPos+3))))){
 							System.out.println("值不对");
 							notifyText.setText("");
 							return;
@@ -327,24 +334,37 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 				notifyText.setText("");
 				return;
 			}
-//			System.out.println(value+"   "+valueLen +"   "+key);
+			int j = 0;
+			int i = 1;
+			try {
+				i = Integer.parseInt(key);
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+//			System.out.println("i = "+i+"   j="+j);
 			if(valueLen%4 == 1){
-				if(key.charAt(0) == value.charAt(valueLen-1)){
-					notifyText.setText("第二位不要填写"+key.charAt(1));
-//					Toast.makeText(MainActivity.this, "第二位不要填写"+key.charAt(1), Toast.LENGTH_SHORT).show();
+				if(value.charAt(valueLen - 1)== '2'){
+					j =0;
 				}else{
-					notifyText.setText("");
+					j = 1;
 				}
+				notifyText.setText("第二位不要填写"+keyMapValues[i][j].charAt(1));
 			}else if(valueLen%4 == 2){
-				if(key.charAt(0) == value.charAt(valueLen-2)
-						&& key.charAt(1) == value.charAt(valueLen-1)){
-					notifyText.setText("第三位不要填写"+key.charAt(2));
+				
+				if(value.charAt(valueLen - 2)== '2'){
+					j =0;
+				}else{
+					j = 1;
+				}
+				if(keyMapValues[i][j].charAt(1) == value.charAt(valueLen-1)){
+					notifyText.setText("第三位不要填写"+keyMapValues[i][j].charAt(2));
 //					Toast.makeText(MainActivity.this, "第三位不要填写"+key.charAt(2), Toast.LENGTH_SHORT).show();
 				}else{
 					notifyText.setText("");
 				}
 			}else{
-				notifyText.setText("第一位不要填写"+key.charAt(0));
+				notifyText.setText("");
+//				notifyText.setText("第一位不要填写"+key.charAt(0));
 //				Toast.makeText(MainActivity.this, "第一位不要填写"+key.charAt(0), Toast.LENGTH_SHORT).show();
 			}
 		}
@@ -414,13 +434,14 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 					}
 					if(i+1 < sliptedList.size() 
 							&& stringList.get(i+1).length >j
-							&& stringList.get(i)[j].equals(stringList.get(i+1)[j])){
+							&& (keyMap.get(stringList.get(i)[j])).equals(keyMap.get(stringList.get(i+1)[j]))){
 						colors[j] = R.color.red;
 						sliptedList.get(i+1)[j] = R.color.red;
 					}
 				}
 				for(int j = 1;j<colors.length;j++){
-					if(stringList.get(i)[j].equals(stringList.get(i)[j-1])){
+					if( (keyMap.get(stringList.get(i)[j]) != null) 
+							&& (keyMap.get(stringList.get(i)[j])).equals(keyMap.get(stringList.get(i)[j-1]))){
 						sameCount ++;
 					}else{
 						sameCount=1;
