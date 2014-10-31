@@ -348,7 +348,6 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 				notifyText.setText("");
 				return;
 			}
-//			System.out.println("i = "+i+"   j="+j);
 			if(SettingShares.getOpenMohu(sharedPreferences)){
 				int j = 0;
 				int i = 1;
@@ -383,18 +382,29 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 //				Toast.makeText(MainActivity.this, "第一位不要填写"+key.charAt(0), Toast.LENGTH_SHORT).show();
 				}
 			}else{
+				String keyString = "";
+				for (String str : keyMap.keySet()) {
+					if(keyMap.get(str).equals(key)){
+						keyString = str;
+					}
+				}
+				System.out.println("key:"+key+"   "+keyString);
 				if(valueLen%4 == 1){
-					notifyText.setText("第二位不要填写"+keyMap.get(key).charAt(1));
+					if(keyString.charAt(0) == value.charAt(valueLen-1)){
+						notifyText.setText("第二位不要填写"+keyString.charAt(1));
+					}else{
+						notifyText.setText("");
+					}
 				}else if(valueLen%4 == 2){
-					if(keyMap.get(key).charAt(0) == value.charAt(valueLen-2)
-							&& keyMap.get(key).charAt(1) == value.charAt(valueLen-1)){
-						notifyText.setText("第三位不要填写"+keyMap.get(key).charAt(2));
+					if(keyString.charAt(0) == value.charAt(valueLen-2)
+							&& keyString.charAt(1) == value.charAt(valueLen-1)){
+						notifyText.setText("第三位不要填写"+keyString.charAt(2));
 //					Toast.makeText(MainActivity.this, "第三位不要填写"+key.charAt(2), Toast.LENGTH_SHORT).show();
 					}else{
 						notifyText.setText("");
 					}
 				}else{
-					notifyText.setText("第一位不要填写"+keyMap.get(key).charAt(0));
+					notifyText.setText("第一位不要填写"+keyString.charAt(0));
 	//				Toast.makeText(MainActivity.this, "第一位不要填写"+key.charAt(0), Toast.LENGTH_SHORT).show();
 				}
 			}
