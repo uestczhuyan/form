@@ -7,7 +7,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import junit.framework.Test;
@@ -18,6 +20,7 @@ import com.actionbarsherlock.view.MenuItem;
 
 import android.os.Bundle;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -262,19 +265,20 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 				value = itemRemove(str);
 				if(value.length() % 4 == 2){
 					System.out.println("notifu");
+					arrays.put(selectIndex, value);
 					adapter.notifyDataSetChanged();
 				}
 				break;
 			default:
 				break;
 		}
+		arrays.put(selectIndex, value);
 		if(!value.equals(str)){
 //			System.out.println(str.length());
 			if(value.length() % 4 == 3){
 				adapter.notifyDataSetChanged();
 			}
 		}
-		arrays.put(selectIndex, value);
 		content.setText(value);
 		
 		makeNotify();
@@ -375,6 +379,62 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 	}
 
 	private class MyAdapter extends BaseAdapter{
+		private List<Integer[]> sliptedList = new ArrayList<Integer[]>();
+		
+		public MyAdapter(){
+			initAdapterData();
+		}
+		
+		private void initAdapterData() {
+			// TODO Auto-generated method stub
+//			System.out.println("initAdapterData()");
+			sliptedList.clear();
+			List<String[]> stringList = new ArrayList<String[]>();
+			for(int i=0;i<arrays.size();i++){
+				stringList.add(arrays.get(i).split("/"));
+				sliptedList.add(new Integer[stringList.get(i).length]);
+			}
+			for(int i=0;i<stringList.size();i++){
+				Integer[] colors = sliptedList.get(i);
+				int sameCount = 1;
+				for(int j = 0;j<colors.length;j++){
+					if(colors[j] == null){
+						colors[j] = android.R.color.white;
+					}
+					if(i+1 < sliptedList.size() 
+							&& stringList.get(i+1).length >j
+							&& stringList.get(i)[j].equals(stringList.get(i+1)[j])){
+						colors[j] = R.color.red;
+						sliptedList.get(i+1)[j] = R.color.red;
+					}
+					if(i==6 && j == 0){
+						System.out.println(stringList.get(i)[j]);
+						System.out.println(stringList.get(i+1)[j]);
+					}
+				}
+				for(int j = 1;j<colors.length;j++){
+					if(stringList.get(i)[j].equals(stringList.get(i)[j-1])){
+						sameCount ++;
+					}else{
+						sameCount=1;
+					}
+					if(sameCount == 3){
+						colors[j] = (colors[j] == R.color.red ) ? R.color.yellow:R.color.green; 
+						colors[j-1] = (colors[j-1] == R.color.red ) ? R.color.yellow:R.color.green; 
+						colors[j-2] = (colors[j-2] == R.color.red ) ? R.color.yellow:R.color.green; 
+					}else if(sameCount >3){
+						colors[j] = (colors[j] == R.color.red ) ? R.color.yellow:R.color.green; 
+					}
+				}
+			}
+		}
+
+		@Override
+		public void notifyDataSetChanged() {
+			// TODO Auto-generated method stub
+			initAdapterData();
+			super.notifyDataSetChanged();
+		}
 
 		@Override
 		public int getCount() {
@@ -425,7 +485,8 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 			}else{
 				String[] strs = str.split("/");
 				TextView keyView = null;
-				for(String key : strs){
+				for(int i=0;i<strs.length;i++){
+					String key = strs[i];
 					if(key == null || key.length() <= 2){
 						break;
 					}
@@ -433,9 +494,10 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 //							.getLayoutInflater().inflate(R.layout.textview, null);
 					keyView = new TextView(MainActivity.this);
 					keyView.setText(""+keyMap.get(key));
-					keyView.setPadding(5, 0, 5,0);
+					keyView.setPadding(10, 0, 10,0);
 					keyView.setTextSize(SIZE);
 					keyView.setGravity(Gravity.CENTER);
+					keyView.setBackgroundColor(getResources().getColor(sliptedList.get(position)[i]));
 					layout.addView(keyView);
 				}
 			}
