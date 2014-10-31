@@ -29,6 +29,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -54,6 +57,7 @@ public class SettingActivity  extends SherlockActivity{
 	private ListView listView;
 	private List<File> files = new ArrayList<File>();
 	private MyAdapter adapter;
+	private CheckBox open;
 	
 	/* (non-Javadoc)
 	 * @see android.app.Activity#onCreate(android.os.Bundle)
@@ -77,6 +81,17 @@ public class SettingActivity  extends SherlockActivity{
 		
 		patchEditText = (EditText) findViewById(R.id.setting_patch_edit);
 		patchEditText.setText(SettingShares.getPatch(sharedPreferences)+"");
+		open = (CheckBox) findViewById(R.id.setting_open_mohu_check);
+		open.setChecked(SettingShares.getOpenMohu(sharedPreferences));
+		
+		open.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				// TODO Auto-generated method stub
+				SettingShares.storeMohu(isChecked, sharedPreferences);
+			}
+		});
 		
 		freshFileList();
 		

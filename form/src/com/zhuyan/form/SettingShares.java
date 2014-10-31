@@ -13,6 +13,22 @@ public class SettingShares {
 	
 	private static final String KEY_PATCH_NUM = "patch";
 	private static final String KEY_FILE = "file";
+	private static final String KEY_MOHU = "mohu";
+	
+	public static boolean getOpenMohu(SharedPreferences sharedPreferences){
+		return sharedPreferences.getBoolean(KEY_MOHU, true);
+	}
+	
+	public static boolean storeMohu(boolean open,SharedPreferences sharedPreferences){
+		 SharedPreferences.Editor editor = sharedPreferences.edit();
+			try {
+				editor.putBoolean(KEY_MOHU, open);
+				return editor.commit();
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+			return false;
+	}
 	
 	public static int getPatch(SharedPreferences sharedPreferences){
 		return sharedPreferences.getInt(KEY_PATCH_NUM, 2);

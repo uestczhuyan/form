@@ -11,7 +11,6 @@
        android:id="@+id/setting_open_tv"
        android:text="对比前面的行数:" 
        android:padding="10dp"
-       android:layout_below="@+id/title_layout"
        android:textSize="20sp"
        />
  
@@ -26,10 +25,31 @@
      android:layout_alignParentRight="true" 
      android:numeric="integer"
      />
+  <TextView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_gravity="left"
+       android:id="@+id/setting_open_mohu_tv"
+       android:text="时候设置模糊（112跟221一样）:" 
+       android:padding="10dp"
+       android:textSize="20sp"
+       android:paddingTop="5dp"
+       android:layout_below="@+id/setting_open_tv"
+       />
+ 
+ <CheckBox 
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:id="@+id/setting_open_mohu_check"
+     android:layout_alignBaseline="@+id/setting_open_mohu_tv"
+     android:layout_alignBottom="@+id/setting_open_mohu_tv"
+     android:layout_marginRight="10dp"
+     android:layout_alignParentRight="true" 
+     />
 	<LinearLayout 
 	    android:layout_width="match_parent"
 	    android:layout_height="match_parent"
-	    android:layout_below="@+id/setting_open_tv"
+	    android:layout_below="@+id/setting_open_mohu_tv"
 	    android:orientation="vertical"
 	    android:layout_margin="10dp"
 	    >
