@@ -42,6 +42,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 	
 	private ListView listView;
 	private TextView content;
+	private TextView notifyText;
 	private ImageView addOne;
 	private ImageView addTwo;
 	private Button delBtn;
@@ -103,6 +104,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 		addOne = (ImageView) findViewById(R.id.add_one);
 		addTwo = (ImageView) findViewById(R.id.add_two);
 		delBtn = (Button) findViewById(R.id.del_btn);
+		notifyText = (TextView) findViewById(R.id.notify);
 		
 		addOne.setClickable(true);
 		addTwo.setClickable(true);
@@ -264,7 +266,6 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 			case R.id.del_btn:
 				value = itemRemove(str);
 				if(value.length() % 4 == 2){
-					System.out.println("notifu");
 					arrays.put(selectIndex, value);
 					adapter.notifyDataSetChanged();
 				}
@@ -313,28 +314,38 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 					}else{
 						if(!key.equals(arrays.get(selectIndex-patch).substring(startPos,startPos+3))){
 							System.out.println("值不对");
+							notifyText.setText("");
 							return;
 						}
 					}
 				}else{
+					notifyText.setText("");
 					return;
 				}
 			}
 			if(key == null){
+				notifyText.setText("");
 				return;
 			}
-			System.out.println(valueLen +"   "+key);
+//			System.out.println(value+"   "+valueLen +"   "+key);
 			if(valueLen%4 == 1){
 				if(key.charAt(0) == value.charAt(valueLen-1)){
-					Toast.makeText(MainActivity.this, "第二位不要填写"+key.charAt(1), Toast.LENGTH_SHORT).show();
+					notifyText.setText("第二位不要填写"+key.charAt(1));
+//					Toast.makeText(MainActivity.this, "第二位不要填写"+key.charAt(1), Toast.LENGTH_SHORT).show();
+				}else{
+					notifyText.setText("");
 				}
 			}else if(valueLen%4 == 2){
 				if(key.charAt(0) == value.charAt(valueLen-2)
 						&& key.charAt(1) == value.charAt(valueLen-1)){
-					Toast.makeText(MainActivity.this, "第三位不要填写"+key.charAt(2), Toast.LENGTH_SHORT).show();
+					notifyText.setText("第三位不要填写"+key.charAt(2));
+//					Toast.makeText(MainActivity.this, "第三位不要填写"+key.charAt(2), Toast.LENGTH_SHORT).show();
+				}else{
+					notifyText.setText("");
 				}
 			}else{
-				Toast.makeText(MainActivity.this, "第一位不要填写"+key.charAt(0), Toast.LENGTH_SHORT).show();
+				notifyText.setText("第一位不要填写"+key.charAt(0));
+//				Toast.makeText(MainActivity.this, "第一位不要填写"+key.charAt(0), Toast.LENGTH_SHORT).show();
 			}
 		}
 	}
@@ -406,10 +417,6 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 							&& stringList.get(i)[j].equals(stringList.get(i+1)[j])){
 						colors[j] = R.color.red;
 						sliptedList.get(i+1)[j] = R.color.red;
-					}
-					if(i==6 && j == 0){
-						System.out.println(stringList.get(i)[j]);
-						System.out.println(stringList.get(i+1)[j]);
 					}
 				}
 				for(int j = 1;j<colors.length;j++){
