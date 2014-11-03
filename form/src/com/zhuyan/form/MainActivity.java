@@ -18,6 +18,7 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -60,7 +61,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
+		getSupportActionBar().setDisplayOptions(getSupportActionBar().DISPLAY_SHOW_CUSTOM);
 		sharedPreferences = getSharedPreferences(SettingShares.NAME, 0);
 		
 //		testAddData();
@@ -151,33 +152,39 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 	protected void onStop() {
 		// TODO Auto-generated method stub
 //		System.out.println("stop "+contentFile.getName());
-		BufferedWriter writer = null;
-		try {
-			writer = new BufferedWriter(new FileWriter(contentFile));
-			for(int i=0;i<arrays.size();i++){
-				String s = arrays.get(i);
-				if( s!= null && s.length() > 0){
-					writer.write(s.toString(), 0, s.toString().length());
-					writer.newLine();
-				}
-			}
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}finally{
+		for(int k=0;k<=3;k++){
+			System.out.println(";="+k+"   save file");
+			BufferedWriter writer = null;
 			try {
-				if(writer != null){
-					writer.flush();
-					writer.close();
-					writer = null;
+				writer = new BufferedWriter(new FileWriter(contentFile));
+				for(int i=0;i<arrays.size();i++){
+					String s = arrays.get(i);
+					if( s!= null && s.length() > 0){
+						writer.write(s.toString(), 0, s.toString().length());
+						writer.newLine();
+						writer.flush();
+					}
 				}
-			} catch (Exception e2) {
+				k=4;
+			}catch (Exception e) {
 				// TODO: handle exception
-				e2.printStackTrace();
+				System.out.println("store file:e"+e);
+				e.printStackTrace();
+			}finally{
+				try {
+					if(writer != null){
+						writer.flush();
+						writer.close();
+						writer = null;
+					}
+				} catch (Exception e2) {
+					// TODO: handle exception
+					e2.printStackTrace();
+				}
 			}
 		}
 		super.onStop();
-	}
+	};
 
 	/* (non-Javadoc)
 	 * @see android.app.Activity#onResume()
@@ -255,6 +262,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// TODO Auto-generated method stub
 		menu.add(0, R.id.menu_settings, 1, "…Ë÷√");
+		menu.findItem(R.id.menu_settings).setIcon(getResources().getDrawable(android.R.drawable.ic_menu_more));
 		return super.onCreateOptionsMenu(menu);
 	}
 
