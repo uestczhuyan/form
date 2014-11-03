@@ -15,6 +15,7 @@ import java.util.Map;
 import junit.framework.Test;
 
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.internal.view.menu.ActionMenu;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
@@ -62,6 +63,8 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		getSupportActionBar().setDisplayOptions(getSupportActionBar().DISPLAY_SHOW_CUSTOM);
+		getSupportActionBar().setDisplayShowHomeEnabled(true);
+		getSupportActionBar().setTitle("±Ì∏Ò");
 		sharedPreferences = getSharedPreferences(SettingShares.NAME, 0);
 		
 //		testAddData();
@@ -262,6 +265,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// TODO Auto-generated method stub
 		menu.add(0, R.id.menu_settings, 1, "…Ë÷√");
+		menu.findItem(R.id.menu_settings).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		menu.findItem(R.id.menu_settings).setIcon(getResources().getDrawable(android.R.drawable.ic_menu_more));
 		return super.onCreateOptionsMenu(menu);
 	}
