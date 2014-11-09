@@ -21,6 +21,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -81,6 +83,43 @@ public class SettingActivity  extends SherlockActivity{
 		
 		patchEditText = (EditText) findViewById(R.id.setting_patch_edit);
 		patchEditText.setText(SettingShares.getPatch(sharedPreferences)+"");
+		patchEditText.addTextChangedListener(new TextWatcher() {
+			
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void afterTextChanged(Editable s) {
+				// TODO Auto-generated method stub
+				int value = 0;
+				try {
+					value = Integer.parseInt(s.toString());
+					if(value <= 0){
+						Toast.makeText(SettingActivity.this, "输入不能小于0", Toast.LENGTH_SHORT).show();
+					}else{
+						try {
+							SettingShares.storePatch(value, sharedPreferences);
+//							System.out.println(SettingShares.getPatch(sharedPreferences));
+						} catch (Exception e) {
+							// TODO: handle exception
+						}
+					}
+				} catch (Exception e) {
+					// TODO: handle exception
+					Toast.makeText(SettingActivity.this, "输入不正确", Toast.LENGTH_SHORT).show();
+				}
+			}
+		});
 		open = (CheckBox) findViewById(R.id.setting_open_mohu_check);
 		open.setChecked(SettingShares.getOpenMohu(sharedPreferences));
 		
@@ -200,11 +239,11 @@ public class SettingActivity  extends SherlockActivity{
 	@Override
 	protected void onStop() {
 		// TODO Auto-generated method stub
-		try {
-			SettingShares.storePatch(Integer.parseInt(patchEditText.getText().toString()), sharedPreferences);
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
+//		try {
+//			SettingShares.storePatch(Integer.parseInt(patchEditText.getText().toString()), sharedPreferences);
+//		} catch (Exception e) {
+//			// TODO: handle exception
+//		}
 		super.onStop();
 	}
 

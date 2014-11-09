@@ -195,6 +195,8 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 	@Override
 	protected void onResume() {
 		// TODO Auto-generated method stub
+//		sharedPreferences = getSharedPreferences(SettingShares.NAME, 0);
+		
 		initData();
 		
 		contentFile = new File(SettingShares.ROOT+"/"+SettingShares.getFileName(sharedPreferences));
@@ -471,7 +473,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 		
 		private void initAdapterData() {
 			// TODO Auto-generated method stub
-//			System.out.println("initAdapterData()");
+			System.out.println("initAdapterData()  " + SettingShares.getPatch(sharedPreferences));
 			sliptedList.clear();
 			List<String[]> stringList = new ArrayList<String[]>();
 			for(int i=0;i<arrays.size();i++){
@@ -481,16 +483,35 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 			for(int i=0;i<stringList.size();i++){
 				Integer[] colors = sliptedList.get(i);
 				int sameCount = 1;
+				int checkSize = SettingShares.getPatch(sharedPreferences);
+//				System.out.println("data "+checkSize);
+				if(checkSize >= 1){
+					checkSize = checkSize+1;
+				}else{
+					checkSize = 2;
+				}
 				for(int j = 0;j<colors.length;j++){
 					if(colors[j] == null){
 						colors[j] = android.R.color.white;
 					}
-					if(i+1 < sliptedList.size() 
-							&& stringList.get(i+1).length >j
-							&& (keyMap.get(stringList.get(i)[j]) != null) 
-							&& (keyMap.get(stringList.get(i)[j])).equals(keyMap.get(stringList.get(i+1)[j]))){
-						colors[j] = R.color.red;
-						sliptedList.get(i+1)[j] = R.color.red;
+					
+					boolean isRed = true;
+					for(int k=1;k<checkSize;k++){
+						if(i+k < sliptedList.size() 
+								&& stringList.get(i+k).length >j
+								&& (keyMap.get(stringList.get(i)[j]) != null) 
+								&& (keyMap.get(stringList.get(i)[j])).equals(keyMap.get(stringList.get(i+k)[j]))){
+							
+						}else{
+							isRed = false;
+							break;
+						}
+					}
+					if(isRed){
+						for(int k=1;k<checkSize;k++){
+							colors[j] = R.color.red;
+							sliptedList.get(i+k)[j] = R.color.red;
+						}
 					}
 				}
 				for(int j = 1;j<colors.length;j++){
