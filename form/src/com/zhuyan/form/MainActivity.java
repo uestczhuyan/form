@@ -269,6 +269,10 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 		menu.add(0, R.id.menu_settings, 1, "…Ë÷√");
 		menu.findItem(R.id.menu_settings).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		menu.findItem(R.id.menu_settings).setIcon(getResources().getDrawable(android.R.drawable.ic_menu_more));
+	
+		menu.add(0, R.id.menu_check_file, 2, "µº≥ˆ");
+		menu.findItem(R.id.menu_check_file).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+		menu.findItem(R.id.menu_check_file).setIcon(getResources().getDrawable(android.R.drawable.ic_menu_share));
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -277,6 +281,9 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 		// TODO Auto-generated method stub
 		if(item.getItemId() == R.id.menu_settings){
 			SettingActivity.redirectToActivity(MainActivity.this);
+			return true;
+		}else if(item.getItemId() == R.id.menu_check_file){
+			ShowFileActivity.redirectToActivity(MainActivity.this);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

@@ -23,6 +23,7 @@
             </intent-filter>
         </activity>
         <activity android:name="com.zhuyan.form.SettingActivity"></activity>
+        <activity android:name="com.zhuyan.form.ShowFileActivity"></activity>
     </application>
 	
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
