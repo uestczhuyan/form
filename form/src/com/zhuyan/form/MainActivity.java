@@ -21,6 +21,9 @@ import com.actionbarsherlock.view.MenuItem;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.view.Gravity;
@@ -269,6 +272,10 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 		menu.add(0, R.id.menu_settings, 1, "设置");
 		menu.findItem(R.id.menu_settings).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		menu.findItem(R.id.menu_settings).setIcon(getResources().getDrawable(android.R.drawable.ic_menu_more));
+	
+		menu.add(0, R.id.menu_check_file, 2, "导出");
+		menu.findItem(R.id.menu_check_file).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+		menu.findItem(R.id.menu_check_file).setIcon(getResources().getDrawable(android.R.drawable.ic_menu_share));
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -277,6 +284,9 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 		// TODO Auto-generated method stub
 		if(item.getItemId() == R.id.menu_settings){
 			SettingActivity.redirectToActivity(MainActivity.this);
+			return true;
+		}else if(item.getItemId() == R.id.menu_check_file){
+			new FileTask().execute();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
@@ -485,11 +495,11 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 				int sameCount = 1;
 				int checkSize = SettingShares.getPatch(sharedPreferences);
 //				System.out.println("data "+checkSize);
-				if(checkSize >= 1){
-					checkSize = checkSize+1;
-				}else{
-					checkSize = 2;
-				}
+//				if(checkSize >= 1){
+//					checkSize = checkSize+1;
+//				}else{
+//					checkSize = 2;
+//				}
 				for(int j = 0;j<colors.length;j++){
 					if(colors[j] == null){
 						colors[j] = android.R.color.white;
@@ -630,6 +640,190 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 			content.setText(arrays.get(position));
 			
 			makeNotify();
+		}
+	}
+	
+	private class FileTask extends AsyncTask<Void, Void, Boolean>{
+
+		private Dialog dialog;
+		
+		
+			
+		/* (non-Javadoc)
+		 * @see android.os.AsyncTask#onPreExecute()
+		 */
+		@Override
+		protected void onPreExecute() {
+			// TODO Auto-generated method stub
+			ProgressDialog.Builder builder = new ProgressDialog.Builder(MainActivity.this);
+			builder.setMessage(R.string.app_name);
+			builder.setMessage("正在计算并且导出文件...");
+			dialog = builder.create();
+			dialog.show();
+			super.onPreExecute();
+		}
+
+		@Override
+		protected Boolean doInBackground(Void... params) {
+			// TODO Auto-generated method stub
+			BufferedWriter writer = null;
+			try {
+				File file = new File(SettingShares.ROOT+"/"+SettingShares.getFileName(sharedPreferences)+"_count");
+				if(file.exists() && file.isFile()){
+					
+				}else{
+					file.createNewFile();
+				}
+				writer = new BufferedWriter(new FileWriter(file));
+				countForFile(writer);
+			}catch (Exception e) {
+				// TODO: handle exception
+				System.out.println("store file:e"+e);
+				e.printStackTrace();
+				return false;
+			}finally{
+				try {
+					if(writer != null){
+						writer.flush();
+						writer.close();
+						writer = null;
+					}
+				} catch (Exception e2) {
+					// TODO: handle exception
+					e2.printStackTrace();
+					return false;
+				}
+			}
+			return true;
+		}
+
+		/**
+		 * @param writer
+		 * @throws IOException 
+		 */
+		private void countForFile(BufferedWriter writer) throws IOException {
+			// TODO Auto-generated method stub
+			int okCount = 0;
+			int falseCount =0;
+			int path = SettingShares.getPatch(sharedPreferences);
+			boolean muhu = SettingShares.getOpenMohu(sharedPreferences);
+			List<String[]> values = new ArrayList<String[]>();
+			for(int index=0;index < arrays.size();index++){
+				String value = arrays.get(index);
+				if(value != null){
+					values.add(value.split("/"));
+				}else{
+					values.add(new String[0]);
+				}
+			}
+			for(int index = path;index<values.size();index++){
+				boolean isOk = true;
+				String key = null;
+				for(int i=0;i<values.get(index).length;i++){
+					isOk = true;
+					key = null;
+					for(int offset = 1;offset <= path;offset++){
+						if(values.get(index-offset).length > i){
+							if(key == null){
+								key = values.get(index-offset)[i];
+								key = keyMap.get(key);
+								if(key == null){
+									isOk = false;
+									break;
+								}
+							}else{
+								if(!(key.equals(keyMap.get(values.get(index-offset)[i])))){
+									isOk = false;
+									break;
+								}
+							}
+						}else{
+							isOk = false;
+							break;
+						}
+					}
+					
+					if(isOk && values.get(index)[i].length() ==3){
+						if(muhu){
+							if(key.equals(keyMap.get(values.get(index)[i]))){
+//								System.out.print("NN");
+								writer.write("NN");
+								writer.flush();
+								falseCount = falseCount+2;
+							}else{
+								int keyNum = 1;
+								try {
+									keyNum = Integer.parseInt(key);
+								} catch (Exception e) {
+									// TODO: handle exception
+								}
+								if(values.get(index)[i].substring(0, 2).equals(keyMapValues[keyNum][0])
+										|| values.get(index)[i].substring(0, 2).equals(keyMapValues[keyNum][1])){
+//									System.out.print("NY");
+									writer.write("NY");
+									writer.flush();
+									falseCount++;
+									okCount++;
+								}else{
+//									System.out.print("Y");
+									writer.write("Y");
+									writer.flush();
+									okCount++;
+								}
+							}
+//							System.out.println(key);
+						}else{
+							String keyString = "";
+							for (String str : keyMap.keySet()) {
+								if(keyMap.get(str).equals(key)){
+									keyString = str;
+								}
+							}
+							
+							if(keyString.equals(values.get(index)[i])){
+								writer.write("NNN");
+								writer.flush();
+								falseCount = falseCount+3;
+							}else if(keyString.substring(0, 2).equals(values.get(index)[i].substring(0, 2))){
+								writer.write("NNY");
+								writer.flush();
+								falseCount = falseCount+2;
+								okCount++;
+							}else if(keyString.charAt(0) == values.get(index)[i].charAt(0)){
+								writer.write("NY");
+								writer.flush();
+								falseCount++;
+								okCount++;
+							}else{
+								writer.write("Y");
+								writer.flush();
+								okCount++;
+							}
+						}
+					}
+					//for 循环计算每一行的每个值
+				}
+			}
+			
+			writer.newLine();
+			writer.write("总数："+(falseCount+okCount)+"  N:"+falseCount+"  Y:"+okCount);
+//			System.out.println("总数："+(falseCount+okCount)+"  N:"+falseCount+"  Y:"+okCount);
+			writer.flush();
+		}
+
+		@Override
+		protected void onPostExecute(Boolean result) {
+			// TODO Auto-generated method stub
+			System.out.println("result:"+result);
+			if(dialog != null && dialog.isShowing()){
+				dialog.dismiss();
+			}
+			if(result!= null && result){
+				ShowFileActivity.redirectToActivity(MainActivity.this);
+			}else{
+				Toast.makeText(MainActivity.this, "导出失败	", Toast.LENGTH_LONG).show();
+			}
+			super.onPostExecute(result);
 		}
 	}
 }
