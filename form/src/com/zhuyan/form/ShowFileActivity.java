@@ -20,6 +20,10 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.TextView;
+import android.content.Context;
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Bundle;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
@@ -95,5 +99,5 @@ public class ShowFileActivity extends SherlockActivity{
 		}
 		return super.onOptionsItemSelected(item);
 	}
-
+	
 }

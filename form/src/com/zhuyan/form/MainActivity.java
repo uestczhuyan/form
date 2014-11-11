@@ -757,8 +757,8 @@ public class MainActivity extends SherlockActivity implements OnClickListener,On
 								} catch (Exception e) {
 									// TODO: handle exception
 								}
-								if(values.get(index)[i].substring(0, 2).equals(keyMapValues[keyNum][0])
-										|| values.get(index)[i].substring(0, 2).equals(keyMapValues[keyNum][1])){
+								if(values.get(index)[i].substring(0, 2).equals(keyMapValues[keyNum][0].substring(0, 2))
+										|| values.get(index)[i].substring(0, 2).equals(keyMapValues[keyNum][1].substring(0, 2))){
 //									System.out.print("NY");
 									writer.write("NY");
 									writer.flush();
