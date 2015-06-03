@@ -160,6 +160,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 				e.printStackTrace();
 			}
 		}
+		System.out.println("onResume");
 
 		BufferedReader dr = null;
 		results.clear();
@@ -188,8 +189,13 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 					doRight();
 				}
 			}
+			
+			notifyTextRight.setText("\n 最终结果:" + sum);
+			notifyTextLeft.setText("现在值是:" + baseNotify*MapInitUtil.getValueInPox(py, px, map));
+			System.out.println("init:"+py+"   "+px+"   n:"+baseNotify);
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.out.println(e);
 		} finally {
 			if (dr != null) {
 				try {
@@ -259,6 +265,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 			if (results.size() > 0) {
 				results.remove(results.size() - 1);
 			}
+			reCount();
 			break;
 		case R.id.recover_btn:
 			results.clear();
@@ -266,18 +273,49 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 		default:
 			break;
 		}
+		notifyTextRight.setText("\n 最终结果:" + sum);
+		notifyTextLeft.setText("现在值是:" + baseNotify*MapInitUtil.getValueInPox(py, px, map));
 		adapter.notifyDataSetChanged();
 		listView.setSelection(adapter.getCount() - 1);
+		
+		System.out.println("y:"+py+"   x:"+px);
 	}
 
 	/**
-	 * 如果左边有值 向左边移动，否则向下移动</br> 特殊情况，px = 1时候，直接向下移动
+	 * 
+	 */
+	private void reCount() {
+		px=0;
+		py=0;
+		sum = 0.0;
+		for(Integer i:results){
+			if(i== 1){
+				doWrong(false);
+			}else{
+				doRight(false);
+			}
+		}
+	}
+
+	/**
+	 * 如果左边有值 向左边移动，否则向下移动</br>
+	 * 特殊情况，px = 1时候，前面一部并且是正确值，直接向下移动
 	 */
 	private boolean doWrong() {
-		if (px == 1) {
+		return doWrong(true);
+	}
+
+	/**
+	 * @return
+	 */
+	private boolean doWrong(boolean show) {
+		int oldpx = px,oldpy=py;
+		if (px == 1 && results.size() > 0 && results.get(results.size()-1) == 2) {
 			if (py >= MAX_PY) {
-				Toast.makeText(MainActivity.this, "无法往下移动", Toast.LENGTH_SHORT)
-						.show();
+				if(show){
+					Toast.makeText(MainActivity.this, "无法往下移动", Toast.LENGTH_SHORT)
+							.show();
+				}
 				return false;
 			}
 			py++;
@@ -286,16 +324,20 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 			px--;
 		} else {
 			if (py >= MAX_PY) {
-				Toast.makeText(MainActivity.this, "无法往下移动", Toast.LENGTH_SHORT)
-						.show();
+				if(show){
+					Toast.makeText(MainActivity.this, "无法往下移动", Toast.LENGTH_SHORT)
+							.show();
+				}
 				return false;
 			}
 			px = 0;
 			py++;
 		}
 
-		results.add(1);
-		sum = sum - baseNotify * MapInitUtil.getValueInPox(py, px, map);
+		if(show){
+			results.add(1);
+		}
+		sum = sum - baseNotify * MapInitUtil.getValueInPox(oldpy, oldpx, map);
 		return true;
 	}
 
@@ -305,10 +347,20 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 	 * @return
 	 */
 	private boolean doRight() {
+		return doRight(true);
+	}
+
+	/**
+	 * @return
+	 */
+	private boolean doRight(boolean show) {
+		int oldpx = px,oldpy=py;
 		List<Double> list = map.get(py);
 		if (list == null || list.size() <= 0) {
-			Toast.makeText(MainActivity.this, "数据出错：py=" + py,
-					Toast.LENGTH_SHORT).show();
+			if(show){
+				Toast.makeText(MainActivity.this, "数据出错：py=" + py,
+						Toast.LENGTH_SHORT).show();
+			}
 			return false;
 		}
 		if (list.size() - 1 > px) {
@@ -317,8 +369,10 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 			px = 0;
 			py = 0;
 		}
-		results.add(2);
-		sum = sum + baseNotify * MapInitUtil.getValueInPox(py, px, map);
+		if(show){
+			results.add(2);
+		}
+		sum = sum + baseNotify * MapInitUtil.getValueInPox(oldpy, oldpx, map);
 		return true;
 	}
 
@@ -330,11 +384,6 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 		// initAdapterData();
 		// }
 
-		private void initAdapterData() {
-			notifyTextLeft.setText("现在值是:" + notify);
-			notifyTextRight.setText("\n 最终结果:" + sum);
-		}
-
 		// @Override
 		// public void notifyDataSetChanged() {
 		// initAdapterData();
@@ -343,12 +392,12 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 
 		@Override
 		public int getCount() {
-			return arrays.size();
+			return results.size();
 		}
 
 		@Override
 		public Object getItem(int position) {
-			return arrays.get(position);
+			return results.get(position);
 		}
 
 		@Override
@@ -387,7 +436,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 			}
 
 			public void setValue(int pos) {
-				tv.setText(arrays.get(pos));
+				tv.setText(results.get(pos)+"");
 				numTv.setText((pos + 1) + "");
 			}
 		}
