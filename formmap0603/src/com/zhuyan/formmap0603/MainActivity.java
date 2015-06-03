@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
@@ -27,6 +28,7 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.zhuyan.formmap0603.util.MapInitUtil;
 import com.zhuyan.formmap0603.util.SettingShares;
 
 public class MainActivity extends SherlockActivity implements OnClickListener,
@@ -46,13 +48,19 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 	private File contentFile;
 
 	private int baseNotify = 0;
+	private Double sum = 0.0;
+	private int px = 0;
+	private int py = 0;
+
+	private static Map<Integer, List<Double>> map = MapInitUtil.initMap();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		sharedPreferences = getSharedPreferences(SettingShares.NAME, 0);
-		checkMail();
+		// 暂时不需要邮箱验证
+		// checkMail();
 
 		setContentView(R.layout.activity_main);
 
@@ -276,6 +284,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 			if (results.size() <= 0) {
 				arrays.add("");
 				notifyTextLeft.setText("现在值是:1");
+				notifyTextRight.setText("\n 最终结果:" + sum);
 				return;
 			}
 			int notify = baseNotify, sum = 0;
