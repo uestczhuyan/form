@@ -8,6 +8,17 @@ import java.util.Map;
 
 public class MapInitUtil {
 
+	public static double getValueInPox(int py, int px,
+			Map<Integer, List<Double>> map) {
+		if (map != null) {
+			List<Double> list = map.get(py);
+			if (list != null && list.size() > px) {
+				return list.get(px);
+			}
+		}
+		return 0.0;
+	}
+
 	public static Map<Integer, List<Double>> initMap() {
 		Map<Integer, List<Double>> map = new HashMap<Integer, List<Double>>();
 		map.put(0, getArrayList(1.0, 2d, 1.5));

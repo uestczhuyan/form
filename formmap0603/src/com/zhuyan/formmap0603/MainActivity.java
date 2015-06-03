@@ -24,6 +24,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
@@ -33,6 +34,8 @@ import com.zhuyan.formmap0603.util.SettingShares;
 
 public class MainActivity extends SherlockActivity implements OnClickListener,
 		OnItemClickListener {
+
+	private final static int MAX_PY = 39;
 
 	private ListView listView;
 	private TextView notifyTextLeft;
@@ -48,9 +51,9 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 	private File contentFile;
 
 	private int baseNotify = 0;
-	private Double sum = 0.0;
 	private int px = 0;
 	private int py = 0;
+	private double sum = 0.0;
 
 	private static Map<Integer, List<Double>> map = MapInitUtil.initMap();
 
@@ -173,6 +176,11 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 				value = key;
 			}
 
+			// 重新开始计算 sum 清空 px py 归0
+			sum = 0.0;
+			px = 0;
+			py = 0;
+
 			for (int i = 0; i < value.length(); i++) {
 				if (value.charAt(i) == '1') {
 					doWrong();
@@ -262,76 +270,76 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 		listView.setSelection(adapter.getCount() - 1);
 	}
 
-	private void doWrong() {
+	/**
+	 * 如果左边有值 向左边移动，否则向下移动</br> 特殊情况，px = 1时候，直接向下移动
+	 */
+	private boolean doWrong() {
+		if (px == 1) {
+			if (py >= MAX_PY) {
+				Toast.makeText(MainActivity.this, "无法往下移动", Toast.LENGTH_SHORT)
+						.show();
+				return false;
+			}
+			py++;
+			px = 0;
+		} else if (px > 0) {
+			px--;
+		} else {
+			if (py >= MAX_PY) {
+				Toast.makeText(MainActivity.this, "无法往下移动", Toast.LENGTH_SHORT)
+						.show();
+				return false;
+			}
+			px = 0;
+			py++;
+		}
+
 		results.add(1);
+		sum = sum - baseNotify * MapInitUtil.getValueInPox(py, px, map);
+		return true;
 	}
 
-	private void doRight() {
+	/**
+	 * 右边移动一格，如果已经是边缘 程序还原。
+	 * 
+	 * @return
+	 */
+	private boolean doRight() {
+		List<Double> list = map.get(py);
+		if (list == null || list.size() <= 0) {
+			Toast.makeText(MainActivity.this, "数据出错：py=" + py,
+					Toast.LENGTH_SHORT).show();
+			return false;
+		}
+		if (list.size() - 1 > px) {
+			px++;
+		} else {
+			px = 0;
+			py = 0;
+		}
 		results.add(2);
+		sum = sum + baseNotify * MapInitUtil.getValueInPox(py, px, map);
+		return true;
 	}
 
 	private class MyAdapter extends BaseAdapter {
 		// private List<Integer[]> sliptedList = new ArrayList<Integer[]>();
-		private ArrayList<String> arrays = new ArrayList<String>();
+		// private ArrayList<String> arrays = new ArrayList<String>();
 
-		public MyAdapter() {
-			initAdapterData();
-		}
+		// public MyAdapter() {
+		// initAdapterData();
+		// }
 
 		private void initAdapterData() {
-			arrays.clear();
-
-			if (results.size() <= 0) {
-				arrays.add("");
-				notifyTextLeft.setText("现在值是:1");
-				notifyTextRight.setText("\n 最终结果:" + sum);
-				return;
-			}
-			int notify = baseNotify, sum = 0;
-			boolean isOk = false;
-			int win, loose;
-			StringBuilder sb = new StringBuilder();
-			for (int start = 0; start < results.size();) {
-				isOk = true;
-				win = 0;
-				loose = 0;
-				sb.delete(0, sb.length());
-				for (int i = 0; i <= 2; i++) {
-					if (results.size() > start + i) {
-						if (results.get(start + i).equals(1)) {
-							loose++;
-						} else {
-							win++;
-						}
-						sb.append(results.get(start + i));
-					} else {
-						isOk = false;
-					}
-				}
-
-				if (isOk) {
-					sum += (win - loose) * notify;
-					sb.append("  结果:" + (win - loose) * notify);
-					if (loose > win) {
-						notify++;
-					} else {
-						if (notify > baseNotify) {
-							notify--;
-						}
-					}
-				}
-				arrays.add(sb.toString());
-				start = start + 3;
-			}
 			notifyTextLeft.setText("现在值是:" + notify);
 			notifyTextRight.setText("\n 最终结果:" + sum);
 		}
 
-		@Override
-		public void notifyDataSetChanged() {
-			initAdapterData();
-			super.notifyDataSetChanged();
-		}
+		// @Override
+		// public void notifyDataSetChanged() {
+		// initAdapterData();
+		// super.notifyDataSetChanged();
+		// }
 
 		@Override
 		public int getCount() {
