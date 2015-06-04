@@ -46,6 +46,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 	private Button recoveryBtn;
 
 	private List<Integer> results = new ArrayList<Integer>();
+	private List<String> sumList = new ArrayList<String>();
 	private MyAdapter adapter;
 	private SharedPreferences sharedPreferences;
 	private File contentFile;
@@ -164,6 +165,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 
 		BufferedReader dr = null;
 		results.clear();
+		sumList.clear();
 		try {
 			dr = new BufferedReader(new InputStreamReader(new FileInputStream(
 					contentFile)));
@@ -265,10 +267,12 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 			if (results.size() > 0) {
 				results.remove(results.size() - 1);
 			}
+			sumList.clear();
 			reCount();
 			break;
 		case R.id.recover_btn:
 			results.clear();
+			sumList.clear();
 			break;
 		default:
 			break;
@@ -338,6 +342,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 			results.add(1);
 		}
 		sum = sum - baseNotify * MapInitUtil.getValueInPox(oldpy, oldpx, map);
+		sumList.add("-"+baseNotify * MapInitUtil.getValueInPox(oldpy, oldpx, map));
 		return true;
 	}
 
@@ -373,6 +378,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 			results.add(2);
 		}
 		sum = sum + baseNotify * MapInitUtil.getValueInPox(oldpy, oldpx, map);
+		sumList.add("+"+baseNotify * MapInitUtil.getValueInPox(oldpy, oldpx, map));
 		return true;
 	}
 
@@ -436,7 +442,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 			}
 
 			public void setValue(int pos) {
-				tv.setText(results.get(pos)+"");
+				tv.setText(results.get(pos)+"      "+sumList.get(pos));
 				numTv.setText((pos + 1) + "");
 			}
 		}
