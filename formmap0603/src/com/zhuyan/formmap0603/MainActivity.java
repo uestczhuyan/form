@@ -46,7 +46,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 	private Button recoveryBtn;
 
 	private List<Integer> results = new ArrayList<Integer>();
-	private List<String> sumList = new ArrayList<String>();
+	private List<Double> sumList = new ArrayList<Double>();
 	private MyAdapter adapter;
 	private SharedPreferences sharedPreferences;
 	private File contentFile;
@@ -54,7 +54,6 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 	private int baseNotify = 0;
 	private int px = 0;
 	private int py = 0;
-	private double sum = 0.0;
 
 	private static Map<Integer, List<Double>> map = MapInitUtil.initMap();
 
@@ -180,7 +179,6 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 			}
 
 			// 重新开始计算 sum 清空 px py 归0
-			sum = 0.0;
 			px = 0;
 			py = 0;
 
@@ -192,7 +190,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 				}
 			}
 			
-			notifyTextRight.setText("\n 最终结果:" + sum);
+			notifyTextRight.setText("\n 最终结果:" + getSum());
 			notifyTextLeft.setText("现在值是:" + baseNotify*MapInitUtil.getValueInPox(py, px, map));
 			System.out.println("init:"+py+"   "+px+"   n:"+baseNotify);
 		} catch (Exception e) {
@@ -211,6 +209,17 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 		// System.out.println(contentFile.getName()+"   "+arrays.size());
 		adapter.notifyDataSetChanged();
 		super.onResume();
+	}
+
+	/**
+	 * @return
+	 */
+	private Double getSum() {
+		double sum = 0;
+		for(Double num:sumList){
+			sum += num;
+		}
+		return sum;
 	}
 
 	@Override
@@ -266,9 +275,10 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 		case R.id.del_btn:
 			if (results.size() > 0) {
 				results.remove(results.size() - 1);
+				sumList.remove(results.size());
 			}
-			sumList.clear();
-			reCount();
+//			sumList.clear();
+//			reCount();
 			break;
 		case R.id.recover_btn:
 			results.clear();
@@ -277,7 +287,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 		default:
 			break;
 		}
-		notifyTextRight.setText("\n 最终结果:" + sum);
+		notifyTextRight.setText("\n 最终结果:" + getSum());
 		notifyTextLeft.setText("现在值是:" + baseNotify*MapInitUtil.getValueInPox(py, px, map));
 		adapter.notifyDataSetChanged();
 		listView.setSelection(adapter.getCount() - 1);
@@ -285,21 +295,20 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 		System.out.println("y:"+py+"   x:"+px);
 	}
 
-	/**
-	 * 
-	 */
-	private void reCount() {
-		px=0;
-		py=0;
-		sum = 0.0;
-		for(Integer i:results){
-			if(i== 1){
-				doWrong(false);
-			}else{
-				doRight(false);
-			}
-		}
-	}
+//	/**
+//	 * 
+//	 */
+//	private void reCount() {
+//		px=0;
+//		py=0;
+//		for(Integer i:results){
+//			if(i== 1){
+//				doWrong(false);
+//			}else{
+//				doRight(false);
+//			}
+//		}
+//	}
 
 	/**
 	 * 如果左边有值 向左边移动，否则向下移动</br>
@@ -341,8 +350,8 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 		if(show){
 			results.add(1);
 		}
-		sum = sum - baseNotify * MapInitUtil.getValueInPox(oldpy, oldpx, map);
-		sumList.add("-"+baseNotify * MapInitUtil.getValueInPox(oldpy, oldpx, map));
+//		sum = sum - baseNotify * MapInitUtil.getValueInPox(oldpy, oldpx, map);
+		sumList.add((-1)*baseNotify * MapInitUtil.getValueInPox(oldpy, oldpx, map));
 		return true;
 	}
 
@@ -377,8 +386,8 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 		if(show){
 			results.add(2);
 		}
-		sum = sum + baseNotify * MapInitUtil.getValueInPox(oldpy, oldpx, map);
-		sumList.add("+"+baseNotify * MapInitUtil.getValueInPox(oldpy, oldpx, map));
+//		sum = sum + baseNotify * MapInitUtil.getValueInPox(oldpy, oldpx, map);
+		sumList.add(baseNotify * MapInitUtil.getValueInPox(oldpy, oldpx, map));
 		return true;
 	}
 
@@ -442,7 +451,7 @@ public class MainActivity extends SherlockActivity implements OnClickListener,
 			}
 
 			public void setValue(int pos) {
-				tv.setText(results.get(pos)+"      "+sumList.get(pos));
+				tv.setText(results.get(pos)+"      "+(sumList.get(pos)>0?"+":"")+sumList.get(pos));
 				numTv.setText((pos + 1) + "");
 			}
 		}
