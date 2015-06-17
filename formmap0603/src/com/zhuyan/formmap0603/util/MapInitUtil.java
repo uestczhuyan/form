@@ -8,12 +8,12 @@ import java.util.Map;
 
 public class MapInitUtil {
 
-	public static double getValueInPox(int py, int px,
+	public static double getValueInPox(Point point,
 			Map<Integer, List<Double>> map) {
-		if (map != null) {
-			List<Double> list = map.get(py);
-			if (list != null && list.size() > px) {
-				return list.get(px);
+		if (map != null && point != null) {
+			List<Double> list = map.get(point.getY());
+			if (list != null && list.size() > point.getX()) {
+				return list.get(point.getX());
 			}
 		}
 		return 0.0;
