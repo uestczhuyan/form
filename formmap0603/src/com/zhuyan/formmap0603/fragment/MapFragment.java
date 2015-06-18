@@ -59,7 +59,7 @@ public class MapFragment extends Fragment {
 			public void onChange() {
 				if (adapter != null) {
 					adapter.notifyDataSetChanged();
-					listView.setSelection(adapter.getCount() - 1);
+					listView.setSelection(dataRunning.getNowPoint().getY());
 				}
 			}
 		};
