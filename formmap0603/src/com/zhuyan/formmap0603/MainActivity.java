@@ -6,26 +6,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
-import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
@@ -36,18 +26,29 @@ import com.zhuyan.formmap0603.util.MapInitUtil;
 import com.zhuyan.formmap0603.util.Point;
 import com.zhuyan.formmap0603.util.SettingShares;
 
-public class MainActivity extends SherlockFragmentActivity {
+public class MainActivity extends SherlockFragmentActivity implements
+		OnClickListener {
 
 	private File contentFile;
 
 	private SharedPreferences sharedPreferences;
-	
-	private ViewPager viewPager= null;
-	
+
+	private ViewPager viewPager = null;
+
+	private TextView notifyTextLeft;
+	private TextView notifyTextRight;
+	private ImageView addOne;
+	private ImageView addTwo;
+	private Button delBtn;
+	private Button recoveryBtn;
+
+	private DataRunning dataRunning;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
+		dataRunning = DataRunning.getInstance();
 		sharedPreferences = getSharedPreferences(SettingShares.NAME, 0);
 		// 暂时不需要邮箱验证
 		// checkMail();
@@ -68,9 +69,53 @@ public class MainActivity extends SherlockFragmentActivity {
 	}
 
 	private void initView() {
-		viewPager = (ViewPager)findViewById(R.id.main_pager);
-		
-		viewPager.setAdapter(new MainViewPaggerAdapter(getSupportFragmentManager(), this));
+		addOne = (ImageView) findViewById(R.id.add_one);
+		addTwo = (ImageView) findViewById(R.id.add_two);
+		notifyTextLeft = (TextView) findViewById(R.id.notify_left);
+		notifyTextRight = (TextView) findViewById(R.id.notify_right);
+		delBtn = (Button) findViewById(R.id.del_btn);
+		recoveryBtn = (Button) findViewById(R.id.recover_btn);
+
+		addOne.setClickable(true);
+		addTwo.setClickable(true);
+
+		addOne.setOnClickListener(this);
+		addTwo.setOnClickListener(this);
+		delBtn.setOnClickListener(this);
+		recoveryBtn.setOnClickListener(this);
+
+		viewPager = (ViewPager) findViewById(R.id.main_pager);
+
+		viewPager.setAdapter(new MainViewPaggerAdapter(
+				getSupportFragmentManager(), this));
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.add_one:
+			dataRunning.doWrong(true, MainActivity.this);
+			break;
+		case R.id.add_two:
+			dataRunning.doRight(true, MainActivity.this);
+			break;
+		case R.id.del_btn:
+			dataRunning.moveBack();
+			break;
+		case R.id.recover_btn:
+			dataRunning.clearAll();
+			break;
+		default:
+			break;
+		}
+		notifyTextRight.setText("\n 最终结果:" + dataRunning.getSum());
+		notifyTextLeft.setText("现在值是:"
+				+ dataRunning.getBaseNotify()
+				* MapInitUtil.getValueInPox(dataRunning.getNowPoint(),
+						dataRunning.map));
+		dataRunning.notifyDataChanged();
+
+		System.out.println(dataRunning.getNowPoint());
 	}
 
 	private void checkMail() {
@@ -89,7 +134,6 @@ public class MainActivity extends SherlockFragmentActivity {
 			this.finish();
 		}
 	}
-	
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -116,9 +160,10 @@ public class MainActivity extends SherlockFragmentActivity {
 
 	@Override
 	protected void onResume() {
-		
+
+		dataRunning = DataRunning.getInstance();
 		System.out.println("activity Onresume");
-		DataRunning.getInstance().setBaseNotify(SettingShares.getPatch(sharedPreferences));
+		dataRunning.setBaseNotify(SettingShares.getPatch(sharedPreferences));
 
 		contentFile = new File(SettingShares.ROOT + "/"
 				+ SettingShares.getFileName(sharedPreferences));
@@ -133,7 +178,7 @@ public class MainActivity extends SherlockFragmentActivity {
 		System.out.println("onResume");
 
 		BufferedReader dr = null;
-		DataRunning.getInstance().clearAll();
+		dataRunning.clearAll();
 		try {
 			dr = new BufferedReader(new InputStreamReader(new FileInputStream(
 					contentFile)));
@@ -148,10 +193,9 @@ public class MainActivity extends SherlockFragmentActivity {
 			}
 
 			// 重新开始计算 sum 清空 px py 归0
-			DataRunning dataRunning = DataRunning.getInstance();
-			dataRunning.setNowPoint( new Point(0, 0));
+			dataRunning.setNowPoint(new Point(0, 0));
 			dataRunning.getPoints().add(dataRunning.getNowPoint());
-			
+
 			for (int i = 0; i < value.length(); i++) {
 				if (value.charAt(i) == '1') {
 					dataRunning.doWrong(false, MainActivity.this);
@@ -159,6 +203,12 @@ public class MainActivity extends SherlockFragmentActivity {
 					dataRunning.doRight(false, MainActivity.this);
 				}
 			}
+
+			notifyTextRight.setText("\n 最终结果:" + dataRunning.getSum());
+			notifyTextLeft.setText("现在值是:"
+					+ dataRunning.getBaseNotify()
+					* MapInitUtil.getValueInPox(dataRunning.getNowPoint(),
+							dataRunning.map));
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println(e);
@@ -176,7 +226,6 @@ public class MainActivity extends SherlockFragmentActivity {
 		super.onResume();
 	}
 
-
 	@Override
 	protected void onStop() {
 		for (int k = 0; k <= 3; k++) {
@@ -184,7 +233,7 @@ public class MainActivity extends SherlockFragmentActivity {
 			try {
 				writer = new BufferedWriter(new FileWriter(contentFile));
 				StringBuilder sb = new StringBuilder();
-				for (Integer b : DataRunning.getInstance().getResults()) {
+				for (Integer b : dataRunning.getResults()) {
 					sb.append(b);
 				}
 				if (sb != null && sb.length() > 0) {
