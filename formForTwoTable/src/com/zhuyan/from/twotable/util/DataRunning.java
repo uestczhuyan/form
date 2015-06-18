@@ -26,8 +26,13 @@ public class DataRunning {
 	private static DataRunning INSTANCE;
 
 	private List<Integer> results = new ArrayList<Integer>();
-	private List<Double> sumList = new ArrayList<Double>();
-	private List<Point> points = new ArrayList<Point>();
+	private List<Double> sumListOne = new ArrayList<Double>();
+	private List<Double> sumListTwo = new ArrayList<Double>();
+	private List<Point> pointsOne = new ArrayList<Point>();
+	private List<Point> pointsTwo = new ArrayList<Point>();
+	
+	private boolean isOneMoveAble = true;
+	private boolean isTwoMoveAble = true;
 
 	public final static int MAX_PY = 39;
 	private int baseNotify = 0;
@@ -71,54 +76,123 @@ public class DataRunning {
 	/**
 	 * @return
 	 */
-	public Double getSum() {
+	public Double getSum(int type) {
 		double sum = 0;
+		List<Double> sumList = type == 1?sumListOne:sumListTwo;
 		for (Double num : sumList) {
 			sum += num;
 		}
 		return sum;
+	}
+	
+	public  List<Double> getCurrentValueList(int type,int y) {
+		Map<Integer, List<Double>> map = type == 1?mapOne:mapTwo;
+		return map.get(y);
+	}
+
+	
+	public  List<Double> getCurrentSumList(int type) {
+		return  type == 1?sumListOne:sumListTwo;
+	}
+	
+	public  List<Point> getCurrentPointList(int type) {
+		return  type == 1?pointsOne:pointsTwo;
+	}
+	
+	private int getCurrentMapSize(int type){
+		return type==1?mapOne.size():mapTwo.size();
+	}
+	
+	public void initPos(){
+		pointsOne.clear();
+		pointsTwo.clear();
+		pointsOne.add(new Point(0,0));
+		pointsTwo.add(new Point(0, 0));
+	}
+	
+	public Double getCurrentNum(int type) {
+		Map<Integer, List<Double>> map = type == 1?mapOne:mapTwo;
+		Point point = getCurrentPoint(type);
+		List<Double> values = map.get(point.getY());
+		if(values != null && values.size() > 1){
+			return values.get(0);
+		}
+		return null;
+	}
+	
+	private Point getCurrentPoint(int type) {
+		List<Point> list = type == 1?pointsOne:pointsTwo;
+		return list.get(list.size()-1);
 	}
 
 	/**
 	 * 如果左边有值 向左边移动，否则向下移动</br> 特殊情况，px = 1时候，前面一部并且是正确值，直接向下移动
 	 */
 	public boolean doWrong(boolean show, Context context) {
-		int px = nowPoint.getX(), py = nowPoint.getY();
-		if (px == 1 && results.size() > 0
-				&& results.get(results.size() - 1) == 2) {
-			if (py >= MAX_PY) {
-				if (show) {
-					Toast.makeText(context, "无法往下移动", Toast.LENGTH_SHORT)
-							.show();
-				}
+		if(isOneMoveAble || isTwoMoveAble){
+			doWrong(show, context,1);
+			doWrong(show, context,2);
+			if(!isOneMoveAble && !isTwoMoveAble){
 				return false;
 			}
-			py++;
-			px = 0;
-		} else if (px > 0) {
-			px--;
-		} else {
-			if (py >= MAX_PY) {
-				if (show) {
-					Toast.makeText(context, "无法往下移动", Toast.LENGTH_SHORT)
-							.show();
-				}
-				return false;
+			results.add(1);
+			notifyDataChanged();
+			return true;
+		}else{
+			if(show){
+				Toast.makeText(context, "表格1,2 都不能移动了  已经结束", Toast.LENGTH_SHORT)
+					.show();
 			}
-			px = 0;
-			py++;
+			return false;
 		}
+		
+	}
+	
 
-		results.add(1);
-		// sum = sum - baseNotify * MapInitUtil.getValueInPox(oldpy, oldpx,
-		// map);
-		sumList.add((-1) * baseNotify
-				* MapInitUtil.getValueInPox(nowPoint, map));
-
-		nowPoint = new Point(px, py);
-		points.add(nowPoint);
-		notifyDataChanged();
-		return true;
+	/**
+	 * @param show
+	 * @param context
+	 * @param i
+	 */
+	private void doWrong(boolean show, Context context, int type) {
+		
+		if(type== 1?isOneMoveAble:isTwoMoveAble){
+			Point point = getCurrentPoint(type);
+			int y = point.getY(),x = point.getX();
+			x--;
+			List<Double> valList = getCurrentValueList(type,y);
+			if(x*-1 >= valList.size()){
+				y++;
+				x=0;
+				if(y<getCurrentMapSize(type)){
+					changeCurrentDate(type,valList.get(0)*-1*baseNotify, x, y);
+					return;
+				}else{
+					if(type==1){
+						isOneMoveAble = true;
+					}else{
+						isTwoMoveAble = false;
+					}
+				}
+			}
+		}
+		if(!isOneMoveAble && !isTwoMoveAble){
+			if(show){
+				Toast.makeText(context, "表格1,2 都不能移动了  已经结束", Toast.LENGTH_SHORT)
+					.show();
+			}
+			return;
+		}
+		if(show){
+			Toast.makeText(context, "表格"+type+"已经不能移动了", Toast.LENGTH_SHORT)
+			.show();
+		}
+		changeCurrentDate(type, 0.0, -1, -1);
+	}
+	
+	private void changeCurrentDate(int type,Double num,int x,int y){
+		getCurrentPointList(type).add(new Point(x, y));
+		getCurrentSumList(type).add(num);
 	}
 
 	public void notifyDataChanged() {
@@ -135,42 +209,49 @@ public class DataRunning {
 	 * @return
 	 */
 	public boolean doRight(boolean show, Context context) {
-		int px = nowPoint.getX(), py = nowPoint.getY();
-		List<Double> list = map.get(py);
-
-		if (list == null || list.size() <= 0) {
-			if (show) {
-				Toast.makeText(context, "数据出错：py=" + py, Toast.LENGTH_SHORT)
-						.show();
+		if(isOneMoveAble || isTwoMoveAble){
+			doRight(show, context,1);
+			doRight(show, context,2);
+			results.add(2);
+			notifyDataChanged();
+			return true;
+		}else{
+			if(show){
+				Toast.makeText(context, "表格1,2 都不能移动了  已经结束", Toast.LENGTH_SHORT)
+					.show();
 			}
 			return false;
 		}
-		if (list.size() - 1 > px) {
-			px++;
-		} else {
-			px = 0;
-			py = 0;
+	}
+	
+private void doRight(boolean show, Context context, int type) {
+		
+		if(type== 1?isOneMoveAble:isTwoMoveAble){
+			Point point = getCurrentPoint(type);
+			int y = point.getY(),x = point.getX();
+			x++;
+			List<Double> valList = getCurrentValueList(type,y);
+			if(x >= valList.size()){
+				y=0;
+				x=0;
+				changeCurrentDate(type,valList.get(0)*baseNotify, x, y);
+				return;
+			}
 		}
-		results.add(2);
-		// sum = sum + baseNotify * MapInitUtil.getValueInPox(oldpy, oldpx,
-		// map);
-		sumList.add(baseNotify * MapInitUtil.getValueInPox(nowPoint, map));
-
-		nowPoint = new Point(px, py);
-		points.add(nowPoint);
-		notifyDataChanged();
-		return true;
+		if(show){
+			Toast.makeText(context, "表格"+type+"已经不能移动了", Toast.LENGTH_SHORT)
+			.show();
+		}
+		changeCurrentDate(type, 0.0, -1, -1);
 	}
 
 	public boolean moveBack() {
 		if (results.size() > 0) {
-			System.out.println(results.size() + "  " + sumList.size() + "  "
-					+ points.size());
 			results.remove(results.size() - 1);
-			sumList.remove(sumList.size() - 1);
-			points.remove(points.size() - 1);
-
-			nowPoint = points.get(points.size() - 1);
+			sumListOne.remove(sumListOne.size() - 1);
+			sumListTwo.remove(sumListTwo.size() - 1);
+			pointsOne.remove(pointsOne.size() - 1);
+			pointsTwo.remove(pointsTwo.size() - 1);
 
 			notifyDataChanged();
 			return true;
@@ -180,8 +261,10 @@ public class DataRunning {
 
 	public void clearAll() {
 		results.clear();
-		sumList.clear();
-		points.clear();
+		sumListOne.clear();
+		sumListTwo.clear();
+		pointsOne.clear();
+		pointsTwo.clear();
 		notifyDataChanged();
 	}
 
@@ -213,61 +296,6 @@ public class DataRunning {
 	 */
 	public void setResults(List<Integer> results) {
 		this.results = results;
-	}
-
-	/**
-	 * @return the sumList
-	 */
-	public List<Double> getSumList() {
-		return sumList;
-	}
-
-	/**
-	 * @param sumList
-	 *            the sumList to set
-	 */
-	public void setSumList(List<Double> sumList) {
-		this.sumList = sumList;
-	}
-
-	/**
-	 * @return the points
-	 */
-	public List<Point> getPoints() {
-		return points;
-	}
-
-	/**
-	 * @param points
-	 *            the points to set
-	 */
-	public void setPoints(List<Point> points) {
-		this.points = points;
-	}
-
-	/**
-	 * @return the nowPoint
-	 */
-	public Point getNowPoint() {
-		return nowPoint;
-	}
-
-	/**
-	 * @param nowPoint
-	 *            the nowPoint to set
-	 */
-	public void setNowPoint(Point nowPoint) {
-		this.nowPoint = nowPoint;
-	}
-
-	/**
-	 * @return
-	 */
-	public Point getLastPoint() {
-		if (points.size() > 2) {
-			return points.get(points.size() - 2);
-		}
-		return null;
 	}
 
 }

@@ -15,14 +15,12 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.zhuyan.from.twotable.adapter.MainViewPaggerAdapter;
 import com.zhuyan.from.twotable.util.DataRunning;
-import com.zhuyan.from.twotable.util.MapInitUtil;
 import com.zhuyan.from.twotable.util.Point;
 import com.zhuyan.from.twotable.util.SettingShares;
 
@@ -35,8 +33,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	private ViewPager viewPager = null;
 
-	private TextView notifyTextLeft;
-	private TextView notifyTextRight;
 	private ImageView addOne;
 	private ImageView addTwo;
 	private Button delBtn;
@@ -71,8 +67,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private void initView() {
 		addOne = (ImageView) findViewById(R.id.add_one);
 		addTwo = (ImageView) findViewById(R.id.add_two);
-		notifyTextLeft = (TextView) findViewById(R.id.notify_left);
-		notifyTextRight = (TextView) findViewById(R.id.notify_right);
 		delBtn = (Button) findViewById(R.id.del_btn);
 		recoveryBtn = (Button) findViewById(R.id.recover_btn);
 
@@ -108,14 +102,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		default:
 			break;
 		}
-		notifyTextRight.setText("\n 最终结果:" + dataRunning.getSum());
-		notifyTextLeft.setText("现在值是:"
-				+ dataRunning.getBaseNotify()
-				* MapInitUtil.getValueInPox(dataRunning.getNowPoint(),
-						dataRunning.map));
 		dataRunning.notifyDataChanged();
-
-		System.out.println(dataRunning.getNowPoint());
 	}
 
 	private void checkMail() {
@@ -193,8 +180,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			}
 
 			// 重新开始计算 sum 清空 px py 归0
-			dataRunning.setNowPoint(new Point(0, 0));
-			dataRunning.getPoints().add(dataRunning.getNowPoint());
+			dataRunning.initPos();
 
 			for (int i = 0; i < value.length(); i++) {
 				if (value.charAt(i) == '1') {
@@ -204,11 +190,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 				}
 			}
 
-			notifyTextRight.setText("\n 最终结果:" + dataRunning.getSum());
-			notifyTextLeft.setText("现在值是:"
-					+ dataRunning.getBaseNotify()
-					* MapInitUtil.getValueInPox(dataRunning.getNowPoint(),
-							dataRunning.map));
+			dataRunning.notifyDataChanged();
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println(e);

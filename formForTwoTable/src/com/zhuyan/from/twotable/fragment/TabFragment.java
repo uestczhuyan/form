@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import com.zhuyan.from.twotable.R;
 import com.zhuyan.from.twotable.util.DataRunning;
+import com.zhuyan.from.twotable.util.MapInitUtil;
 import com.zhuyan.from.twotable.util.DataRunning.OnDataChange;
 
 /**
@@ -29,10 +30,13 @@ import com.zhuyan.from.twotable.util.DataRunning.OnDataChange;
  * 
  *         Create on 2015-6-17 下午9:24:34
  */
-public class TabFragment extends Fragment implements OnItemClickListener {
+public abstract class TabFragment extends Fragment implements OnItemClickListener {
 
 	private ListView listView;
 	private MyAdapter adapter;
+	
+	private TextView notifyTextLeft;
+	private TextView notifyTextRight;
 
 	private DataRunning dataRunning;
 	private OnDataChange onDataChange;
@@ -57,6 +61,11 @@ public class TabFragment extends Fragment implements OnItemClickListener {
 				if (adapter != null) {
 					adapter.notifyDataSetChanged();
 					listView.setSelection(adapter.getCount() - 1);
+					notifyTextRight.setText("\n 最终结果:" + dataRunning.getSum());
+					notifyTextLeft.setText("现在值是:"
+							+ dataRunning.getBaseNotify()
+							* MapInitUtil.getValueInPox(dataRunning.getNowPoint(),
+									dataRunning.map));
 				}
 			}
 		};
@@ -81,6 +90,8 @@ public class TabFragment extends Fragment implements OnItemClickListener {
 
 	private void init() {
 		listView = (ListView) getView().findViewById(R.id.list);
+		notifyTextLeft = (TextView)  getView().findViewById(R.id.notify_left);
+		notifyTextRight = (TextView)  getView().findViewById(R.id.notify_right);
 
 		adapter = new MyAdapter();
 		listView.setAdapter(adapter);
@@ -149,4 +160,7 @@ public class TabFragment extends Fragment implements OnItemClickListener {
 			}
 		}
 	}
+	
+	abstract int getMapValue();
+
 }

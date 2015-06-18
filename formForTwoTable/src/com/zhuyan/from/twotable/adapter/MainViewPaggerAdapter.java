@@ -17,8 +17,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.zhuyan.from.twotable.MainActivity;
-import com.zhuyan.from.twotable.fragment.MapFragment;
-import com.zhuyan.from.twotable.fragment.TabFragment;
+import com.zhuyan.from.twotable.fragment.TabOneFragment;
+import com.zhuyan.from.twotable.fragment.TabTwoFragment;
 
 /**
  * @author zy
@@ -42,9 +42,9 @@ public class MainViewPaggerAdapter extends FragmentPagerAdapter {
 		Fragment fragment = map.get(arg0);
 		if (fragment == null) {
 			if (arg0 == 0) {
-				fragment = new TabFragment();
+				fragment = new TabOneFragment();
 			} else {
-				fragment = new MapFragment();
+				fragment = new TabTwoFragment();
 			}
 			map.put(arg0, fragment);
 		}

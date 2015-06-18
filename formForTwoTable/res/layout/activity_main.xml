@@ -13,4 +13,34 @@
         android:fadingEdge="none"
         android:id="@+id/list"
         ></ListView>
+    <LinearLayout 
+           android:layout_width="fill_parent"
+            android:layout_height="50dp"
+            android:id="@+id/notify"
+           android:orientation="horizontal">
+             <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+            	android:layout_height="50dp"
+	            android:textSize="20sp"
+	            android:singleLine="true"
+	            android:gravity="center_vertical|left"
+	            android:textStyle="bold"
+	            android:textColor="@color/red"
+	            android:id="@+id/notify_left"
+	            android:paddingLeft="10dp"
+	            />
+              <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+            	android:layout_height="50dp"
+	            android:textSize="20sp"
+	            android:singleLine="true"
+	            android:gravity="center_vertical|right"
+	            android:textStyle="bold"
+	            android:textColor="#0020ff"
+	            android:id="@+id/notify_right"
+	            android:paddingRight="10dp"
+	            />
+         </LinearLayout> 
 </LinearLayout>
