@@ -28,11 +28,11 @@ public class DataRunning {
 	private List<Integer> results = new ArrayList<Integer>();
 	private List<Double> sumList = new ArrayList<Double>();
 	private List<Point> points = new ArrayList<Point>();
-	private Point nowPoint = null;
 
 	public final static int MAX_PY = 39;
 	private int baseNotify = 0;
-	public static Map<Integer, List<Double>> map = MapInitUtil.initMap();
+	public static Map<Integer, List<Double>> mapOne = MapInitUtil.initMapOne();
+	public static Map<Integer, List<Double>> mapTwo = MapInitUtil.initMapTwo();
 
 	public interface OnDataChange {
 		void onChange();

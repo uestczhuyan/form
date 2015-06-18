@@ -9,7 +9,7 @@ import android.os.Environment;
 public class SettingShares {
 
 	public static final String ROOT = Environment.getExternalStorageDirectory()
-			.getAbsolutePath() + "/form20150603";
+			.getAbsolutePath() + "/form/fortwotable0618";
 
 	public final static String NAME = "setting";
 
