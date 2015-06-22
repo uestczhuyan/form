@@ -4,7 +4,18 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="com.zhuyan.newform0320.MainActivity" >
-
+	
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+	    android:textSize="20sp"
+	    android:singleLine="true"
+	    android:gravity="center"
+	    android:textStyle="bold"
+	    android:id="@+id/fragment_title"
+	            />
+    
     <ListView 
         android:layout_width="fill_parent"
         android:layout_height="0dp"

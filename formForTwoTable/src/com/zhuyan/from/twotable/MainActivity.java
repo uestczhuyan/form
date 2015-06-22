@@ -102,7 +102,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 		default:
 			break;
 		}
-		dataRunning.notifyDataChanged();
 	}
 
 	private void checkMail() {
@@ -193,7 +192,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			dataRunning.notifyDataChanged();
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println(e);
+			System.out.println(e+"  Onresume");
 		} finally {
 			if (dr != null) {
 				try {

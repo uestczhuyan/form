@@ -104,6 +104,8 @@ public class DataRunning {
 	}
 	
 	public void initPos(){
+		isOneMoveAble =true;
+		isTwoMoveAble = true;
 		pointsOne.clear();
 		pointsTwo.clear();
 		pointsOne.add(new Point(0,0));
@@ -112,16 +114,22 @@ public class DataRunning {
 	
 	public Double getCurrentNum(int type) {
 		Map<Integer, List<Double>> map = type == 1?mapOne:mapTwo;
-		Point point = getCurrentPoint(type);
+		Point point = getNowPoint(type);
+		if(point == null || point.getY() < 0){
+			return null;
+		}
 		List<Double> values = map.get(point.getY());
-		if(values != null && values.size() > 1){
+		if(values != null && values.size() >= 1){
 			return values.get(0);
 		}
 		return null;
 	}
 	
-	private Point getCurrentPoint(int type) {
+	public Point getNowPoint(int type) {
 		List<Point> list = type == 1?pointsOne:pointsTwo;
+		if(list == null || list.size() < 1){
+			return null;
+		}
 		return list.get(list.size()-1);
 	}
 
@@ -132,9 +140,9 @@ public class DataRunning {
 		if(isOneMoveAble || isTwoMoveAble){
 			doWrong(show, context,1);
 			doWrong(show, context,2);
-			if(!isOneMoveAble && !isTwoMoveAble){
-				return false;
-			}
+//			if(!isOneMoveAble && !isTwoMoveAble){
+//				return false;
+//			}
 			results.add(1);
 			notifyDataChanged();
 			return true;
@@ -157,7 +165,7 @@ public class DataRunning {
 	private void doWrong(boolean show, Context context, int type) {
 		
 		if(type== 1?isOneMoveAble:isTwoMoveAble){
-			Point point = getCurrentPoint(type);
+			Point point = getNowPoint(type);
 			int y = point.getY(),x = point.getX();
 			x--;
 			List<Double> valList = getCurrentValueList(type,y);
@@ -169,12 +177,28 @@ public class DataRunning {
 					return;
 				}else{
 					if(type==1){
-						isOneMoveAble = true;
+						isOneMoveAble = false;
 					}else{
 						isTwoMoveAble = false;
 					}
 				}
+			}else{
+				changeCurrentDate(type,valList.get(0)*-1*baseNotify, x, y);
+				return;
 			}
+			if(!isOneMoveAble && !isTwoMoveAble){
+				if(show){
+					Toast.makeText(context, "表格1,2 都不能移动了  已经结束", Toast.LENGTH_SHORT)
+						.show();
+				}
+			}else{
+				if(show){
+					Toast.makeText(context, "表格"+type+"已经不能移动了", Toast.LENGTH_SHORT)
+					.show();
+				}
+			}
+			changeCurrentDate(type,valList.get(0)*-1*baseNotify, x, y);
+			return;
 		}
 		if(!isOneMoveAble && !isTwoMoveAble){
 			if(show){
@@ -183,10 +207,7 @@ public class DataRunning {
 			}
 			return;
 		}
-		if(show){
-			Toast.makeText(context, "表格"+type+"已经不能移动了", Toast.LENGTH_SHORT)
-			.show();
-		}
+		
 		changeCurrentDate(type, 0.0, -1, -1);
 	}
 	
@@ -194,6 +215,7 @@ public class DataRunning {
 		getCurrentPointList(type).add(new Point(x, y));
 		getCurrentSumList(type).add(num);
 	}
+	
 
 	public void notifyDataChanged() {
 		if (onDataChanges != null && onDataChanges.size() > 0) {
@@ -227,7 +249,7 @@ public class DataRunning {
 private void doRight(boolean show, Context context, int type) {
 		
 		if(type== 1?isOneMoveAble:isTwoMoveAble){
-			Point point = getCurrentPoint(type);
+			Point point = getNowPoint(type);
 			int y = point.getY(),x = point.getX();
 			x++;
 			List<Double> valList = getCurrentValueList(type,y);
@@ -236,12 +258,16 @@ private void doRight(boolean show, Context context, int type) {
 				x=0;
 				changeCurrentDate(type,valList.get(0)*baseNotify, x, y);
 				return;
+			}else{
+				changeCurrentDate(type,valList.get(0)*baseNotify, x, y);
+				return;
 			}
+			
 		}
-		if(show){
-			Toast.makeText(context, "表格"+type+"已经不能移动了", Toast.LENGTH_SHORT)
-			.show();
-		}
+//			if(show){
+//				Toast.makeText(context, "表格"+type+"已经不能移动了", Toast.LENGTH_SHORT)
+//				.show();
+//			}
 		changeCurrentDate(type, 0.0, -1, -1);
 	}
 
@@ -252,7 +278,9 @@ private void doRight(boolean show, Context context, int type) {
 			sumListTwo.remove(sumListTwo.size() - 1);
 			pointsOne.remove(pointsOne.size() - 1);
 			pointsTwo.remove(pointsTwo.size() - 1);
-
+			
+			isOneMoveAble = !(getNowPoint(1).getY() == -1);
+			isTwoMoveAble = !(getNowPoint(2).getX() == -1);
 			notifyDataChanged();
 			return true;
 		}

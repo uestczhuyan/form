@@ -6,7 +6,18 @@ import java.util.List;
 import java.util.Map;
 
 public class MapInitUtil {
-
+	
+	public static double getValueInPox(Point point,
+			Map<Integer, List<Double>> map) {
+		if (map != null && point != null) {
+			List<Double> list = map.get(point.getY());
+			if (list != null && list.size() > point.getX()) {
+				return list.get(point.getX());
+			}
+		}
+		return -1.0;
+	}
+	
 	public static Map<Integer, List<Double>> initMapOne() {
 		Map<Integer, List<Double>> map = new HashMap<Integer, List<Double>>();
 
@@ -19,7 +30,7 @@ public class MapInitUtil {
 		map.put(6, getArrayList("20	20	20	20	20"));
 		map.put(7, getArrayList("50	50	50	50"));
 		map.put(8, getArrayList("135 135 135"));
-		map.put(9, getArrayList("405	405"));
+		map.put(9, getArrayList("405 405"));
 
 		return map;
 	}

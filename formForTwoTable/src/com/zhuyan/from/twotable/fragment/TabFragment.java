@@ -9,6 +9,8 @@
  */
 package com.zhuyan.from.twotable.fragment;
 
+import java.util.List;
+
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -24,6 +26,7 @@ import com.zhuyan.from.twotable.R;
 import com.zhuyan.from.twotable.util.DataRunning;
 import com.zhuyan.from.twotable.util.MapInitUtil;
 import com.zhuyan.from.twotable.util.DataRunning.OnDataChange;
+import com.zhuyan.from.twotable.util.Point;
 
 /**
  * @author zy
@@ -37,6 +40,7 @@ public abstract class TabFragment extends Fragment implements OnItemClickListene
 	
 	private TextView notifyTextLeft;
 	private TextView notifyTextRight;
+	private TextView titleTextView;
 
 	private DataRunning dataRunning;
 	private OnDataChange onDataChange;
@@ -61,11 +65,16 @@ public abstract class TabFragment extends Fragment implements OnItemClickListene
 				if (adapter != null) {
 					adapter.notifyDataSetChanged();
 					listView.setSelection(adapter.getCount() - 1);
-					notifyTextRight.setText("\n 最终结果:" + dataRunning.getSum());
-					notifyTextLeft.setText("现在值是:"
-							+ dataRunning.getBaseNotify()
-							* MapInitUtil.getValueInPox(dataRunning.getNowPoint(),
-									dataRunning.map));
+					notifyTextRight.setText("\n 最终结果:" + dataRunning.getSum(getMapValue()));
+					Double now = dataRunning.getCurrentNum(getMapValue());
+					if(now == null){
+						notifyTextLeft.setText("现在值是:--");
+					}else{
+						notifyTextLeft.setText("现在值是:"
+								+ dataRunning.getBaseNotify()
+								* now);
+					}
+					System.out.println(getMapValue()+":"+dataRunning.getNowPoint(getMapValue()));
 				}
 			}
 		};
@@ -78,7 +87,8 @@ public abstract class TabFragment extends Fragment implements OnItemClickListene
 		super.onResume();
 
 		adapter.notifyDataSetChanged();
-		System.out.println("fragment init:" + dataRunning.getNowPoint()
+		dataRunning.notifyDataChanged();
+		System.out.println("fragment init:" + dataRunning.getNowPoint(getMapValue())
 				+ "   n:" + dataRunning.getBaseNotify());
 	}
 
@@ -92,6 +102,9 @@ public abstract class TabFragment extends Fragment implements OnItemClickListene
 		listView = (ListView) getView().findViewById(R.id.list);
 		notifyTextLeft = (TextView)  getView().findViewById(R.id.notify_left);
 		notifyTextRight = (TextView)  getView().findViewById(R.id.notify_right);
+		titleTextView = (TextView) getView().findViewById(R.id.fragment_title);
+		
+		titleTextView.setText("当前是图表:"+getMapValue());
 
 		adapter = new MyAdapter();
 		listView.setAdapter(adapter);
@@ -153,9 +166,19 @@ public abstract class TabFragment extends Fragment implements OnItemClickListene
 			}
 
 			public void setValue(int pos) {
-				tv.setText(dataRunning.getResults().get(pos) + "      "
-						+ (dataRunning.getSumList().get(pos) > 0 ? "+" : "")
-						+ dataRunning.getSumList().get(pos));
+				List<Double> sumList = dataRunning.getCurrentSumList(getMapValue());
+//				DataRunning db = dataRunning;
+//				if(getMapValue() ==2){
+//					System.out.println(sumList);
+//				}
+				if(pos>= sumList.size() || sumList.get(pos).equals(0.0)){
+					tv.setText(dataRunning.getResults().get(pos) + "      --");
+				}else{
+					tv.setText(dataRunning.getResults().get(pos) + "      "
+							+ (sumList.get(pos) > 0 ? "+" : "")
+							+ sumList.get(pos));
+				}
+ 				
 				numTv.setText((pos + 1) + "");
 			}
 		}
