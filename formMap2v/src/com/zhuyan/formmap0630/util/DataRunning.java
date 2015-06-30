@@ -30,7 +30,7 @@ public class DataRunning {
 	private List<Point> points = new ArrayList<Point>();
 	private Point nowPoint = null;
 
-	public final static int MAX_PY = 39;
+	public final static int MAX_PY = 49;
 	private int baseNotify = 0;
 	public static Map<Integer, List<Double>> map = MapInitUtil.initMap();
 
@@ -80,12 +80,11 @@ public class DataRunning {
 	}
 
 	/**
-	 * 如果左边有值 向左边移动，否则向下移动</br> 特殊情况，px = 1时候，前面一部并且是正确值，直接向下移动
+	 * 错误直接往下一行的第一个跳转，直到最后一行
 	 */
 	public boolean doWrong(boolean show, Context context) {
 		int px = nowPoint.getX(), py = nowPoint.getY();
-		if (px == 1 && results.size() > 0
-				&& results.get(results.size() - 1) == 2) {
+		if (py == MAX_PY) {
 			if (py >= MAX_PY) {
 				if (show) {
 					Toast.makeText(context, "无法往下移动", Toast.LENGTH_SHORT)
@@ -93,25 +92,12 @@ public class DataRunning {
 				}
 				return false;
 			}
-			py++;
-			px = 0;
-		} else if (px > 0) {
-			px--;
 		} else {
-			if (py >= MAX_PY) {
-				if (show) {
-					Toast.makeText(context, "无法往下移动", Toast.LENGTH_SHORT)
-							.show();
-				}
-				return false;
-			}
-			px = 0;
 			py++;
+			px = 0;
 		}
 
 		results.add(1);
-		// sum = sum - baseNotify * MapInitUtil.getValueInPox(oldpy, oldpx,
-		// map);
 		sumList.add((-1) * baseNotify
 				* MapInitUtil.getValueInPox(nowPoint, map));
 
@@ -130,7 +116,7 @@ public class DataRunning {
 	}
 
 	/**
-	 * 右边移动一格，如果已经是边缘 程序还原。
+	 * 正确x+1</br> 如果x+1 >= list.size(), 那么py回退。</br> py奇数 退7 偶数退4
 	 * 
 	 * @return
 	 */
@@ -138,22 +124,18 @@ public class DataRunning {
 		int px = nowPoint.getX(), py = nowPoint.getY();
 		List<Double> list = map.get(py);
 
-		if (list == null || list.size() <= 0) {
-			if (show) {
-				Toast.makeText(context, "数据出错：py=" + py, Toast.LENGTH_SHORT)
-						.show();
-			}
-			return false;
-		}
-		if (list.size() - 1 > px) {
-			px++;
-		} else {
+		px++;
+		if (px >= list.size()) {
 			px = 0;
-			py = 0;
+			if (py % 2 == 0) {
+				py = py - 4;
+			} else {
+				py = py - 7;
+			}
+			py = py < 0 ? 0 : py;
 		}
+
 		results.add(2);
-		// sum = sum + baseNotify * MapInitUtil.getValueInPox(oldpy, oldpx,
-		// map);
 		sumList.add(baseNotify * MapInitUtil.getValueInPox(nowPoint, map));
 
 		nowPoint = new Point(px, py);
