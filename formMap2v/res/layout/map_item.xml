@@ -1,0 +1,43 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    tools:context="com.zhuyan.newform0320.MainActivity" >
+	
+   <TextView 
+       style="@style/map_item_text"
+       android:text="23.0"
+       android:id="@+id/map_item_0"
+       />
+   <TextView 
+       style="@style/map_item_text"
+       android:text="23.0"
+       android:id="@+id/map_item_1"
+       />
+   <TextView 
+       style="@style/map_item_text"
+       android:text="23.0"
+       android:id="@+id/map_item_2"
+       />
+   <TextView 
+       style="@style/map_item_text"
+       android:text="23.0"
+       android:id="@+id/map_item_3"
+       />
+   <TextView 
+      style="@style/map_item_text"
+       android:text="23.0"
+       android:id="@+id/map_item_4"
+       />
+   <TextView 
+      style="@style/map_item_text"
+       android:text="23.0"
+       android:id="@+id/map_item_5"
+       />
+   <TextView 
+      style="@style/map_item_text"
+       android:text="23.0"
+       android:id="@+id/map_item_6"
+       />
+</LinearLayout>
