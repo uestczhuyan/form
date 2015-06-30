@@ -83,7 +83,7 @@ public class MapFragment extends Fragment {
 
 		@Override
 		public int getCount() {
-			return dataRunning.MAX_PY;
+			return dataRunning.map.size();
 		}
 
 		@Override
@@ -133,7 +133,9 @@ public class MapFragment extends Fragment {
 			public void setValue(int pos) {
 				List<Double> list = dataRunning.map.get(pos);
 				for (int i = 0; i < texts.length; i++) {
-					if (i < list.size()) {
+					if(i==0){
+						texts[i].setText("ÐòºÅ"+(pos+1)+" :  "+list.get(i).toString());
+					}else if (i < list.size()) {
 						texts[i].setVisibility(View.VISIBLE);
 						texts[i].setText(list.get(i).toString());
 					} else {
